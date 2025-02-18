@@ -32,6 +32,8 @@ async function loadRom(file) {
 }
 
 // A simple loop to step the CPU and then render
+
+//emuLoop is crucial allows the CPu to simulate 1/60th of a second.
 function emuLoop() {
   if (!running) return;
 
