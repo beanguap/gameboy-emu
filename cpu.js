@@ -1,7 +1,9 @@
-// cpu.js
+// CPU.js
+import { opcodes } from "./Instructions.js"; // <-- Make sure the path is correct!
+
 export class CPU {
   constructor() {
-    // Just store registers as properties:
+    // Registers
     this.a = 0;
     this.b = 0;
     this.c = 0;
@@ -16,8 +18,8 @@ export class CPU {
   }
 
   reset() {
-    // You can choose initial values known after the GB BIOS, or keep them zero
-    this.a = 0x01; // for example
+    // You can choose initial values known after the GB BIOS
+    this.a = 0x01;
     this.b = this.c = this.d = this.e = this.f = 0;
     this.h = this.l = 0;
     this.pc = 0x0100;
@@ -30,27 +32,21 @@ export class CPU {
    * @returns {number} - The number of cycles this instruction took
    */
   step(memory) {
+    // 1. Fetch opcode
     const opcode = memory.readByte(this.pc);
-    this.pc = (this.pc + 1) & 0xffff; // wrap at 16 bits
+    // 2. Increment PC
+    this.pc = (this.pc + 1) & 0xffff;
 
-    let cycles = 0;
-
-    switch (opcode) {
-      case 0x00: // NOP
-        // Do nothing
-        cycles = 4;
-        break;
-      case 0x06: // LD B,d8
-        this.b = memory.readByte(this.pc);
-        this.pc = (this.pc + 1) & 0xffff;
-        cycles = 8;
-        break;
-      default:
-        console.warn(`Unimplemented opcode: 0x${opcode.toString(16)}`);
-        cycles = 4; // fallback
-        break;
+    // 3. Dispatch
+    const handler = opcodes[opcode];
+    if (!handler) {
+      console.warn(`Unimplemented opcode: 0x${opcode.toString(16)}`);
+      // fallback cycle count for unknown opcode
+      return 4;
     }
 
+    // 4. Execute
+    const cycles = handler(this, memory);
     return cycles;
   }
 }
