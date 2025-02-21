@@ -1,5 +1,5 @@
 // cpu.js
-import { opcodes } from "./Instructions.js";
+import { opcodes } from "./instructions.js";
 
 export class CPU {
   constructor() {
